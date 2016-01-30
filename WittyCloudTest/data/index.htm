@@ -1,0 +1,192 @@
+<html>
+<!-- Copyright (C) 2015 <>< Charles Lohr, see LICENSE file for more info.
+This particular file may be licensed under the MIT/x11, New BSD or ColorChord Licenses. -->
+<head>
+<title>ESPSocket</title>
+<script language="javascript" type="text/javascript" src=jquery-2.1.4.min.js></script>
+<link rel="stylesheet" href="jquery.mobile-1.4.5.min.css">
+
+<script>
+    $(document).bind('mobileinit',function(){
+        $.mobile.pushStateEnabled = false;
+    });
+
+</script>
+<script language="javascript" type="text/javascript" src="jquery.mobile-1.4.5.min.js"></script>
+<script language="javascript" type="text/javascript" src=menuinterface.js></script>
+
+
+<meta charset="UTF-8">
+<style>
+
+#progressBar {
+    width: 400px;
+    height: 22px;
+    border: 1px solid #111;
+    background-color: #292929;
+}
+
+#progressBar div {
+    height: 100%;
+    color: #fff;
+    text-align: right;
+    line-height: 22px; /* same as #progressBar height if we want text middle aligned */
+    width: 0;
+    background-color: #0099ff;
+}
+
+
+/*#ButtonStatus div {
+color: Red; 
+    height: 100%;
+
+    text-align: right;
+    line-height: 22px;  same as #progressBar height if we want text middle aligned 
+    width: 0;
+    background-color: #0099ff;
+
+
+}*/
+
+table { width: 100%; }
+td { vertical-align: top; }
+
+/*table {border-collapse: collapse;}
+table, td, th {border: 1px solid black; border: 1px solid green;}
+th {background-color: green; color: white;}
+*/
+
+.collapsible { display:none; }
+.inbutton { background-color:blue; }
+#SystemMessage { position: absolute; top: 5px; right: 5px; background-color: DarkSlateBlue; color: #ffffff; right: 5px; display:none; }
+
+</style>
+</head>
+<body style="font-family: HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;>
+<h1>ESP8266 Websockets Demo</h1>
+<hr>
+
+<table width=100% border=1 style="border-collapse: collapse;">
+    <tr>
+        <td>
+            <div id='FPS'> 
+                ----
+            </div> 
+        </td>
+    </tr>
+</table>
+
+<table id="MainMenu">
+
+<tbody>
+
+<tr>
+    <td width=1>
+        <input type=submit onclick="ShowHideEvent( 'Introduction' );" value="Introduction">
+    </td>
+
+    <td>
+        <div id=Introduction class="collapsible" data-collapsible="accordion">
+        <table border=1 style="border-collapse: collapse; color: #000000; background-color: #EAF2D3;">
+        <tr>
+            <td>
+                <p>Welcome to ESP8266 Interface</p>
+                <p>This project demostrates WebSockets using the Arduino port of ESP8266. It uses some awesome projects like <a href=https://github.com/Links2004/arduinoWebSockets>arduinoWebSockets</a> and <a href=https://github.com/cnlohr/colorchord>ColorChord: Embedded</a>.</p>
+                <p>I've tried to port some of the WebSockets functionality from ColorChord: Embedded to work with the Arduino port of ESP8266</p>
+                <p>It uses the SPIFFS file system on the ESP8266 to host a bunch of webpages. It also supports OTA firmware updates.</p>
+                <p>Note: This is a work in progress! Some things are still broken.</p>
+            </td>
+        </tr>
+        </table>
+        </div>
+</tr>   
+<tr>
+    <td width=1>
+        <input type=submit onclick="ShowHideEvent( 'SystemStatus' );" value='System Status' id='SystemStatusClicker'>
+    </td>
+    
+    <td> 
+        <div id=SystemStatus class='collapsible' data-collapsible="accordion">
+            <table width=100% border=1 style="border-collapse: collapse;">
+                <tr>
+                    <td>
+                        <div id='output' style="font-size:32px"> 
+                            n
+                        </div> 
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td width=1>
+        <input type=submit onclick="ShowHideEvent( 'LDR' );LDRTicker();" value='LDR Status' id='LDRClicker'>
+    </td>
+    <td> 
+        <div id='LDR' class='collapsible' data-collapsible="accordion">
+            <table width=100% border=1 style="border-collapse: collapse;">
+                <tr>
+                    <td>
+                        <div id='LDRvalue' style="font-size:32px"> 
+                            ---
+                        </div> 
+<div id="progressBar"><div></div></div>             
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </td>
+</tr>
+
+<tr>
+    <td width=1>
+        <input type=submit onclick="ShowHideEvent( 'RGB' );" value='RGB LED' id='RGBClicker'>
+    </td>
+    <td> 
+        <div id='RGB' class='collapsible' data-collapsible="accordion">
+            <table width=100% border=1 style="border-collapse: collapse;">
+                <tr>
+                    <td>
+                        <div id='RGBLEDSlider'> 
+                            <h2>R</h2> <input id="r" type="range" min="0" max="1023" step="1" onchange="sendRGB();" />
+                            <h2>G</h2> <input id="g" type="range" min="0" max="1023" step="1" onchange="sendRGB();" />
+                            <h2>B</h2> <input id="b" type="range" min="0" max="1023" step="1" onchange="sendRGB();" />
+                        </div> 
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </td>
+</tr>
+
+
+<tr>
+    <td width=1>
+        <input type=submit onclick="ShowHideEvent( 'ButtonState' );ButtonTicker();" value='Button Status' id='ButtonClicker'>
+    </td>
+    <td> 
+        <div id='ButtonState' class='collapsible' data-collapsible="accordion">
+            <table width=100% border=1 style="border-collapse: collapse;">
+                <tr>
+                    <td>
+                        <div id='ButtonStatus' style="font-size:32px"> 
+                            ---
+                        </div> 
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </td>
+</tr>
+
+</tbody>
+</table>
+
+<p><font size=0>Copyright (C) 2016 Aditya Tannu</font></p>
+<div id='SystemMessage'>...</div>
+</body>
+</html>
+
+

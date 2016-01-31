@@ -7,7 +7,6 @@
 #include <Hash.h>
 #include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
-#include <ArduinoOTA.h>
 #include <FS.h>
 
 ESP8266WiFiMulti WiFiMulti;
@@ -50,6 +49,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
               Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
       
               // send message to client
+              delay(5);
               webSocket.sendTXT(num, "C");
           }
           break;
@@ -62,18 +62,21 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
             case 'w': case 'W':  // Request RSSI wx
               rssi = String(WiFi.RSSI());
                // Serial.printf("[%u] Got message: %s\n", num, payload);
+              delay(5);
               webSocket.sendTXT(0,rssi);
               break;
 
             case 'l': case 'L':  // Request LDR
               LDRvalue = analogRead(LDR);
                // Serial.printf("[%u] Got message: %s\n", num, payload);
+              delay(5);
               webSocket.sendTXT(0,LDRvalue);
               break;
 
             case 'b': case 'B':  // Request Button state
               ButtonState = digitalRead(BUTTON);
                // Serial.printf("[%u] Got message: %s\n", num, payload);
+              delay(5);
               webSocket.sendTXT(0,ButtonState);
               break;
 
@@ -86,20 +89,24 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
               analogWrite(GREEN, ((rgb >> 8) & 0xFF)*4);
               analogWrite(BLUE, ((rgb >> 0) & 0xFF)*4);
               // Serial.printf("[%u] Got message: %s\n", num, payload);
+              delay(5);
               webSocket.sendTXT(0,"OK");
               }
               break;
 
             case 'p': // ping, will reply pong
               Serial.printf("[%u] Got message: %s\n", num, payload);
+              delay(5);
               webSocket.sendTXT(0,"pong");
               break;
 
             case 'e': case 'E':   //Echo
+              delay(5);
               webSocket.sendTXT(0,text);
               break;
 
             default:
+              delay(5);
               webSocket.sendTXT(0,"**** UNDEFINED ****");
               Serial.printf("[%u] Got UNDEFINED message: %s\n", num, payload);
               break;
@@ -290,35 +297,11 @@ void setup() {
   webSocket.begin();
   webSocket.onEvent(webSocketEvent);
 
-  // Hostname defaults to esp8266-[ChipID]
-  ArduinoOTA.setHostname(host);
-
-  // No authentication by default
-  // ArduinoOTA.setPassword((const char *)"123");
-
-  ArduinoOTA.onStart([]() {
-    Serial.println("Start");
-  });
-  ArduinoOTA.onEnd([]() {
-    Serial.println("End");
-  });
-  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-    Serial.printf("Progress: %u%%\n", (progress / (total / 100)));
-  });
-  ArduinoOTA.onError([](ota_error_t error) {
-    Serial.printf("Error[%u]: ", error);
-    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-    else if (error == OTA_END_ERROR) Serial.println("End Failed");
-  });
-  ArduinoOTA.begin();
-  Serial.println("ArduinoOTA Ready");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
+  Serial.println(WiFi.macAddress());
 
-    // Set up mDNS responder:
+  // Set up mDNS responder:
   if (!MDNS.begin(host)) {
     Serial.println("Error setting up MDNS responder!");
     while(1) { 
@@ -330,7 +313,6 @@ void setup() {
   Serial.print("Open http://");
   Serial.print(host);
   Serial.println(".local/edit to see the file browser");
-
 
   //SERVER INIT
   //list directory
@@ -357,6 +339,7 @@ void setup() {
   server.begin();
   Serial.println("HTTP server started");
 
+  // Needed this to stabilize Websocket connection
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
 
 }
@@ -364,5 +347,4 @@ void setup() {
 void loop() {
   webSocket.loop();
   server.handleClient();
-  ArduinoOTA.handle();
 }

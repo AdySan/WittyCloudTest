@@ -2,7 +2,8 @@
 <!-- Copyright (C) 2015 <>< Charles Lohr, see LICENSE file for more info.
 This particular file may be licensed under the MIT/x11, New BSD or ColorChord Licenses. -->
 <head>
-<title>ESPSocket</title>
+<title>ESP8266 Witty Cloud Demo</title>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
 <script language="javascript" type="text/javascript" src=jquery-2.1.4.min.js></script>
 <link rel="stylesheet" href="jquery.mobile-1.4.5.min.css">
 
@@ -14,8 +15,6 @@ This particular file may be licensed under the MIT/x11, New BSD or ColorChord Li
 </script>
 <script language="javascript" type="text/javascript" src="jquery.mobile-1.4.5.min.js"></script>
 <script language="javascript" type="text/javascript" src=menuinterface.js></script>
-
-
 <meta charset="UTF-8">
 <style>
 
@@ -35,26 +34,8 @@ This particular file may be licensed under the MIT/x11, New BSD or ColorChord Li
     background-color: #0099ff;
 }
 
-
-/*#ButtonStatus div {
-color: Red; 
-    height: 100%;
-
-    text-align: right;
-    line-height: 22px;  same as #progressBar height if we want text middle aligned 
-    width: 0;
-    background-color: #0099ff;
-
-
-}*/
-
 table { width: 100%; }
 td { vertical-align: top; }
-
-/*table {border-collapse: collapse;}
-table, td, th {border: 1px solid black; border: 1px solid green;}
-th {background-color: green; color: white;}
-*/
 
 .collapsible { display:none; }
 .inbutton { background-color:blue; }
@@ -63,13 +44,13 @@ th {background-color: green; color: white;}
 </style>
 </head>
 <body style="font-family: HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;>
-<h1>ESP8266 Websockets Demo</h1>
+<h2>ESP8266 Witty Cloud Demo</h2>
 <hr>
 
 <table width=100% border=1 style="border-collapse: collapse;">
     <tr>
         <td>
-            <div id='FPS'> 
+            <div id='FPS' style="font-size:32px"> 
                 ----
             </div> 
         </td>
@@ -84,17 +65,18 @@ th {background-color: green; color: white;}
     <td width=1>
         <input type=submit onclick="ShowHideEvent( 'Introduction' );" value="Introduction">
     </td>
-
+</tr>
+<tr>
     <td>
-        <div id=Introduction class="collapsible" data-collapsible="accordion">
-        <table border=1 style="border-collapse: collapse; color: #000000; background-color: #EAF2D3;">
+        <div id=Introduction class="collapsible" >
+        <table border=1 style="border-collapse: collapse; color: #000000;">
         <tr>
             <td>
-                <p>Welcome to ESP8266 Interface</p>
-                <p>This project demostrates WebSockets using the Arduino port of ESP8266. It uses some awesome projects like <a href=https://github.com/Links2004/arduinoWebSockets>arduinoWebSockets</a> and <a href=https://github.com/cnlohr/colorchord>ColorChord: Embedded</a>.</p>
-                <p>I've tried to port some of the WebSockets functionality from ColorChord: Embedded to work with the Arduino port of ESP8266</p>
-                <p>It uses the SPIFFS file system on the ESP8266 to host a bunch of webpages. It also supports OTA firmware updates.</p>
-                <p>Note: This is a work in progress! Some things are still broken.</p>
+                <p>ESP8266 Witty Cloud Board Demo</p>
+                <p>This is a sample sketch for testing all the peripherals on the ESP8266 Witty Cloud board. It also demonstrates some notable features of the ESP8266/Arduino port like hosting a webserver and a <a href=https://github.com/Links2004/arduinoWebSockets>websockets server</a>. This project is heavily inspired by the <a href=https://github.com/cnlohr/colorchord>ColorChord: Embedded</a>project.</p>
+                
+                <img src="https://cloud.githubusercontent.com/assets/744810/12700003/5ac3cf0a-c786-11e5-93c3-5b146e50b894.jpg" alt="Witty Cloud Board" style="width:304px;height:228px;">
+                
             </td>
         </tr>
         </table>
@@ -104,9 +86,10 @@ th {background-color: green; color: white;}
     <td width=1>
         <input type=submit onclick="ShowHideEvent( 'SystemStatus' );" value='System Status' id='SystemStatusClicker'>
     </td>
-    
+</tr>   
+<tr>
     <td> 
-        <div id=SystemStatus class='collapsible' data-collapsible="accordion">
+        <div id=SystemStatus class='collapsible' >
             <table width=100% border=1 style="border-collapse: collapse;">
                 <tr>
                     <td>
@@ -124,8 +107,10 @@ th {background-color: green; color: white;}
     <td width=1>
         <input type=submit onclick="ShowHideEvent( 'LDR' );LDRTicker();" value='LDR Status' id='LDRClicker'>
     </td>
+</tr>   
+<tr>
     <td> 
-        <div id='LDR' class='collapsible' data-collapsible="accordion">
+        <div id='LDR' class='collapsible' >
             <table width=100% border=1 style="border-collapse: collapse;">
                 <tr>
                     <td>
@@ -144,8 +129,10 @@ th {background-color: green; color: white;}
     <td width=1>
         <input type=submit onclick="ShowHideEvent( 'RGB' );" value='RGB LED' id='RGBClicker'>
     </td>
+</tr>   
+<tr>
     <td> 
-        <div id='RGB' class='collapsible' data-collapsible="accordion">
+        <div id='RGB' class='collapsible' >
             <table width=100% border=1 style="border-collapse: collapse;">
                 <tr>
                     <td>
@@ -166,8 +153,10 @@ th {background-color: green; color: white;}
     <td width=1>
         <input type=submit onclick="ShowHideEvent( 'ButtonState' );ButtonTicker();" value='Button Status' id='ButtonClicker'>
     </td>
+</tr>   
+<tr>
     <td> 
-        <div id='ButtonState' class='collapsible' data-collapsible="accordion">
+        <div id='ButtonState' class='collapsible' >
             <table width=100% border=1 style="border-collapse: collapse;">
                 <tr>
                     <td>

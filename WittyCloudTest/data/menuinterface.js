@@ -99,7 +99,7 @@ function Ticker()
 		time_since_hz++;
 		if( time_since_hz > 3)
 		{
-			FPS.innerHTML = "<p style=\"color:red;\">Offline!</p>"
+			FPS.innerHTML = "<p style=\"color:red; font-size:32px\">Offline!</p>"
 			if( commsup != 0 ) IssueSystemMessage( "WebSocket Connection Lost..." );
 			commsup = 0;
 			// setTimeout(function(){ StartWebSocket(); }, 3000);
@@ -107,13 +107,13 @@ function Ticker()
 		}
 		else
 		{
-			FPS.innerHTML = "<p style=\"color:red;\">Online: " + 0 + " Hz</p>"
+			FPS.innerHTML = "<p style=\"color:red; font-size:32px\">Online: " + 0 + " Hz</p>"
 		}
 	}
 	else
 	{
 		time_since_hz = 0;
-		FPS.innerHTML = "<p style=\"color:green;\">Online: " + lasthz + " Hz</p>"
+		FPS.innerHTML = "<p style=\"color:green; font-size:32px\">Online: " + lasthz + " Hz</p>"
 	}
 }
 
